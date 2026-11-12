@@ -1,0 +1,1768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Omnia · My inbox</title>
+<meta name="description" content="Omnia: your latest Gmail emails, sorted into groups. Private test.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0A0A0C">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Crect width='24' height='24' rx='6' fill='%230A0A0C'/%3E%3Ccircle cx='12' cy='12' r='7' stroke='%23A5B4FF' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='2.6' fill='%23A5B4FF'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+html{background:#0A0A0C;color-scheme:dark;-webkit-text-size-adjust:100%}
+body{margin:0;background:#0A0A0C}
+button{font-family:inherit}
+button:focus-visible{outline:2px solid #A5B4FF;outline-offset:2px}
+.row:hover{background:#101013}
+.card:hover{border-color:#34343D !important;background:#121216 !important}
+.tab:hover{border-color:#3A3A44 !important}
+.btn:hover{border-color:#44444F !important}
+input::placeholder,textarea::placeholder{color:#8A8A96}
+
+[hidden]{display:none!important}
+.gate{min-height:100vh;background:#0A0A0C;color:#ECECEF;font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5}
+.gate-head{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #1A1A1F}
+.gate-logo{display:flex;color:#A5B4FF}
+.gate-word{font-family:'Space Grotesk','Inter',sans-serif;font-weight:600;font-size:20px;letter-spacing:-.02em}
+.gate-main{max-width:520px;margin:0 auto;padding:36px 20px 72px;box-sizing:border-box}
+.gate-eyebrow{margin:0 0 6px;font-size:13px;color:#8A8A96}
+.gate-title{margin:0;font-family:'Space Grotesk','Inter',sans-serif;font-size:32px;line-height:1.15;font-weight:600;letter-spacing:-.02em}
+.gate-lead{margin:12px 0 0;color:#A0A0AB;font-size:15px}
+.gate-facts{list-style:none;margin:24px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.gate-facts li{display:flex;gap:12px;padding:12px 14px;background:#0E0E11;border:1px solid #1C1C21;border-radius:10px;color:#B4B4BE;font-size:13.5px;line-height:1.5}
+.gate-facts li:before{content:"";flex:none;width:7px;height:7px;margin-top:7px;border-radius:50%;background:#62D2C3}
+.gate-warn{margin:16px 0 0;padding:12px 14px;border:1px solid #3A3320;background:#14120A;border-radius:10px;color:#D8C79A;font-size:13.5px}
+.gate-btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;margin-top:20px;border:0;border-radius:12px;background:#ECECEF;color:#0A0A0C;font:inherit;font-weight:600;font-size:15px;cursor:pointer}
+.gate-btn:disabled{opacity:.6;cursor:default}
+.gate-btn:focus-visible,.gate-link:focus-visible{outline:2px solid #A5B4FF;outline-offset:2px}
+.gate-msg{min-height:20px;margin:14px 0 0;font-size:13.5px;line-height:1.5;color:#A0A0AB}
+.gate-msg[data-kind="warn"]{color:#F2C879}
+.gate-msg[data-kind="ok"]{color:#62D2C3}
+.gate-link{display:inline-block;margin-top:18px;padding:10px 0;color:#A5B4FF;font-size:13.5px;text-decoration:none}
+
+</style>
+</head>
+<body>
+<noscript><p style="margin:0;padding:24px 20px;color:#ECECEF;font-family:system-ui,sans-serif;">Omnia needs JavaScript to run. Please turn it on and reload.</p></noscript>
+<div id="connect" class="gate">
+  <header class="gate-head">
+    <span class="gate-logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle><circle cx="12" cy="12" r="3.2" fill="currentColor"></circle></svg></span>
+    <span class="gate-word">omnia</span>
+  </header>
+  <main class="gate-main">
+    <p class="gate-eyebrow">Private test · your own inbox</p>
+    <h1 class="gate-title">Connect your Gmail</h1>
+    <p class="gate-lead">Omnia reads your 50 latest inbox emails and sorts them into groups it finds by itself.</p>
+    <ul class="gate-facts">
+      <li>Read-only. Omnia can't send, delete or change anything.</li>
+      <li>Nothing is saved on a server. Your emails load into this tab and are gone when you close it.</li>
+      <li>Sorting runs on your device using simple rules. It isn't AI yet.</li>
+    </ul>
+    <p class="gate-warn"><strong>Google will warn you that Omnia isn't verified.</strong> That's expected while it's private. Tap <strong>Advanced</strong>, then <strong>Go to Omnia (unsafe)</strong>.</p>
+    <button id="go" class="gate-btn" type="button">Connect Gmail</button>
+    <p id="msg" class="gate-msg" role="status" aria-live="polite"></p>
+    <a class="gate-link" href="./">Try the demo with sample emails instead</a>
+  </main>
+</div>
+<div id="app" hidden></div>
+<template id="tpl">
+
+<div style="min-height:100vh; background:#0A0A0C; color:#ECECEF; font-family:'Inter',system-ui,sans-serif; font-size:14px; line-height:1.5;">
+
+  <header style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; border-bottom:1px solid #1A1A1F;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="display:flex; color:{{ accent }};">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle><circle cx="12" cy="12" r="3.2" fill="currentColor"></circle></svg>
+      </span>
+      <span style="font-family:'Space Grotesk','Inter',sans-serif; font-weight:600; font-size:20px; letter-spacing:-0.02em;">omnia</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; padding:6px 12px; border:1px solid #24242A; border-radius:999px; font-size:12.5px; color:#A0A0AB;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#62D2C3;"></span>
+      <span>{{ syncLabel }}</span>
+    </div>
+  </header>
+
+  <main style="max-width:1040px; margin:0 auto; padding:28px 20px 72px; box-sizing:border-box;">
+
+    <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:13px; color:#8A8A96; margin-bottom:6px;">{{ todayLabel }}</div>
+    </sc-if>
+    <h1 style="margin:0; font-family:'Space Grotesk','Inter',sans-serif; font-size:32px; line-height:1.15; font-weight:600; letter-spacing:-0.02em;">{{ title }}</h1>
+    <p style="margin:6px 0 0; color:#A0A0AB; font-size:14px;">{{ subtitle }}</p>
+
+    <div style="display:flex; gap:12px; align-items:flex-start; margin-top:20px; padding:16px 18px; background:#101013; border:1px solid #1F1F25; border-radius:14px;">
+      <span style="display:flex; padding-top:2px; color:{{ accent }};">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="M19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7L19 16z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"></path></svg>
+      </span>
+      <span style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+        <span style="font-size:12.5px; color:#8A8A96;">Omnia's read</span>
+        <span style="font-size:15px; color:#ECECEF; line-height:1.5;">{{ digest }}</span>
+      </span>
+    </div>
+
+    <nav aria-label="Groups" style="display:flex; gap:8px; overflow-x:auto; margin-top:22px; padding-bottom:6px;">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="9">
+        <button class="tab" onClick="{{ t.pick }}" aria-current="{{ t.current }}" style="flex:0 0 auto; display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 16px; border-radius:999px; border:1px solid {{ t.border }}; background:{{ t.bg }}; color:{{ t.fg }}; font:inherit; font-weight:500; font-size:13.5px; white-space:nowrap; cursor:pointer;">
+          <sc-if value="{{ t.hasDot }}" hint-placeholder-val="{{ true }}">
+            <span style="width:8px; height:8px; border-radius:50%; background:{{ t.color }};"></span>
+          </sc-if>
+          <span>{{ t.name }}</span>
+          <sc-if value="{{ t.hasCount }}" hint-placeholder-val="{{ true }}">
+            <span style="font-weight:400; color:{{ t.countFg }};">{{ t.count }}</span>
+          </sc-if>
+        </button>
+      </sc-for>
+      <button class="tab" onClick="{{ openNew }}" aria-current="{{ newCurrent }}" style="flex:0 0 auto; display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 16px; border-radius:999px; border:1px {{ newBorderStyle }} {{ newBorder }}; background:{{ newBg }}; color:{{ newFg }}; font:inherit; font-weight:500; font-size:13.5px; white-space:nowrap; cursor:pointer;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+        <span>New group</span>
+      </button>
+    </nav>
+
+    <sc-if value="{{ hasNotice }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="margin-top:12px; padding:12px 16px; border:1px solid #24242A; border-radius:12px; background:#101013; color:{{ accent }}; font-size:13.5px;">{{ notice }}</div>
+    </sc-if>
+
+    <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+      <h2 style="margin:28px 0 4px; font-size:13px; font-weight:500; color:#8A8A96;">Groups Omnia found</h2>
+      <p style="margin:0 0 12px; font-size:12.5px; color:#8A8A96;">Omnia builds these from your own mail. Rename, merge or tidy any of them.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:12px;">
+        <sc-for list="{{ cards }}" as="c" hint-placeholder-count="4">
+          <button class="card" onClick="{{ c.pick }}" style="flex:1 1 280px; min-width:0; min-height:112px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-between; gap:10px; text-align:left; padding:16px 18px; background:#101013; border:1px solid #1F1F25; border-radius:14px; color:#ECECEF; font:inherit; cursor:pointer;">
+            <span style="display:flex; align-items:center; gap:8px; width:100%;">
+              <span style="flex:0 0 auto; width:8px; height:8px; border-radius:50%; background:{{ c.color }};"></span>
+              <span style="font-weight:600; font-size:15px;">{{ c.name }}</span>
+              <span style="margin-left:auto; font-size:12.5px; color:#8A8A96;">{{ c.countLabel }}</span>
+            </span>
+            <span style="display:block; font-size:13px; color:#A0A0AB;">{{ c.desc }}</span>
+            <sc-if value="{{ c.hasFoot }}" hint-placeholder-val="{{ false }}">
+              <span style="display:block; font-size:12.5px; color:{{ c.footColor }};">{{ c.foot }}</span>
+            </sc-if>
+          </button>
+        </sc-for>
+        <button class="card" onClick="{{ openNew }}" style="flex:1 1 280px; min-width:0; min-height:112px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:center; gap:6px; text-align:left; padding:16px 18px; background:transparent; border:1px dashed #34343D; border-radius:14px; color:#ECECEF; font:inherit; cursor:pointer;">
+          <span style="display:flex; align-items:center; gap:8px; font-weight:600; font-size:15px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+            <span>Add your own group</span>
+          </span>
+          <span style="display:block; font-size:13px; color:#A0A0AB;">Name it, and Omnia finds the emails that belong.</span>
+        </button>
+      </div>
+
+      <sc-if value="{{ hasTidy }}" hint-placeholder-val="{{ true }}">
+        <h2 style="margin:32px 0 4px; font-size:13px; font-weight:500; color:#8A8A96;">Tidied away</h2>
+        <p style="margin:0 0 12px; font-size:12.5px; color:#8A8A96;">Omnia keeps these out of your way, but still flags anything time-sensitive.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <sc-for list="{{ tidyCards }}" as="c" hint-placeholder-count="3">
+            <button class="card" onClick="{{ c.pick }}" style="flex:1 1 280px; min-width:0; box-sizing:border-box; display:flex; flex-direction:column; gap:4px; text-align:left; padding:12px 16px; background:#0D0D10; border:1px solid #1A1A1F; border-radius:12px; color:#ECECEF; font:inherit; cursor:pointer;">
+              <span style="display:flex; align-items:center; gap:8px; width:100%;">
+                <span style="flex:0 0 auto; width:7px; height:7px; border-radius:50%; background:{{ c.color }};"></span>
+                <span style="font-weight:500;">{{ c.name }}</span>
+                <span style="margin-left:auto; font-size:12.5px; color:#8A8A96;">{{ c.countLabel }}</span>
+              </span>
+              <span style="display:block; font-size:12.5px; color:#8A8A96;">{{ c.desc }}</span>
+              <sc-if value="{{ c.hasFoot }}" hint-placeholder-val="{{ false }}">
+                <span style="display:block; font-size:12.5px; color:{{ c.footColor }};">{{ c.foot }}</span>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isGroupView }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;">
+        <button class="btn" onClick="{{ toggleTidy }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 16px; border-radius:10px; border:1px solid #2B2B33; background:#16161A; color:#ECECEF; font:inherit; font-weight:500; font-size:13.5px; cursor:pointer;">{{ tidyLabel }}</button>
+        <button class="btn" onClick="{{ startRename }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 16px; border-radius:10px; border:1px solid #2B2B33; background:#16161A; color:#ECECEF; font:inherit; font-weight:500; font-size:13.5px; cursor:pointer;">Rename</button>
+        <sc-if value="{{ canMerge }}" hint-placeholder-val="{{ true }}">
+          <button class="btn" onClick="{{ startMerge }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 16px; border-radius:10px; border:1px solid #2B2B33; background:#16161A; color:#ECECEF; font:inherit; font-weight:500; font-size:13.5px; cursor:pointer;">Merge into another group</button>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ showRename }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; gap:12px; margin-top:12px; max-width:520px; padding:16px; border:1px solid #1F1F25; border-radius:14px; background:#101013;">
+          <label for="rename-input" style="font-size:13px; font-weight:500;">New name</label>
+          <input id="rename-input" type="text" placeholder="{{ renamePlaceholder }}" style="box-sizing:border-box; width:100%; min-height:48px; padding:0 14px; background:#0A0A0C; border:1px solid #2B2B33; border-radius:10px; color:#ECECEF; font:inherit; font-size:15px;">
+          <sc-if value="{{ hasPanelError }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="font-size:13.5px; color:#F2C879;">{{ panelError }}</div>
+          </sc-if>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <button onClick="{{ saveRename }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 18px; border-radius:10px; border:1px solid #ECECEF; background:#ECECEF; color:#0A0A0C; font:inherit; font-weight:600; font-size:14px; cursor:pointer;">Save name</button>
+            <button class="btn" onClick="{{ cancelPanel }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 18px; border-radius:10px; border:1px solid #2B2B33; background:#16161A; color:#ECECEF; font:inherit; font-weight:500; font-size:14px; cursor:pointer;">Cancel</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showMerge }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; gap:12px; margin-top:12px; max-width:640px; padding:16px; border:1px solid #1F1F25; border-radius:14px; background:#101013;">
+          <div style="font-size:13px; font-weight:500;">{{ mergeTitle }}</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <sc-for list="{{ mergeOptions }}" as="mo" hint-placeholder-count="4">
+              <button class="btn" onClick="{{ mo.pick }}" style="display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 14px; border-radius:999px; border:1px solid #2B2B33; background:#16161A; color:#D0D0D8; font:inherit; font-weight:500; font-size:13px; cursor:pointer;">
+                <span style="width:8px; height:8px; border-radius:50%; background:{{ mo.color }};"></span>
+                <span>{{ mo.name }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div>
+            <button class="btn" onClick="{{ cancelPanel }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 18px; border-radius:10px; border:1px solid #2B2B33; background:#16161A; color:#ECECEF; font:inherit; font-weight:500; font-size:14px; cursor:pointer;">Cancel</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <p style="margin:12px 0 0; font-size:12.5px; color:#8A8A96;">{{ groupNote }}</p>
+    </sc-if>
+
+    <sc-if value="{{ isNewForm }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:20px; margin-top:24px; max-width:640px;">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label for="area-name" style="font-size:13px; font-weight:500;">Group name</label>
+          <input id="area-name" type="text" placeholder="e.g. Food, Travel, Money" style="box-sizing:border-box; width:100%; min-height:48px; padding:0 14px; background:#101013; border:1px solid #2B2B33; border-radius:10px; color:#ECECEF; font:inherit; font-size:15px;">
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label for="area-desc" style="font-size:13px; font-weight:500;">What belongs here? <span style="font-weight:400; color:#8A8A96;">Optional</span></label>
+          <textarea id="area-desc" rows="3" placeholder="e.g. takeaways, groceries and anything to do with food" style="box-sizing:border-box; width:100%; padding:12px 14px; background:#101013; border:1px solid #2B2B33; border-radius:10px; color:#ECECEF; font:inherit; font-size:15px; line-height:1.5; resize:vertical;"></textarea>
+        </div>
+        <sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+          <div role="alert" style="font-size:13.5px; color:#F2C879;">{{ formError }}</div>
+        </sc-if>
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+          <span style="font-size:12.5px; color:#8A8A96; margin-right:4px;">Try an example</span>
+          <sc-for list="{{ examples }}" as="ex" hint-placeholder-count="3">
+            <button class="btn" onClick="{{ ex.pick }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 14px; border-radius:999px; border:1px solid #2B2B33; background:#16161A; color:#D0D0D8; font:inherit; font-weight:500; font-size:13px; cursor:pointer;">{{ ex.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button onClick="{{ findMatches }}" style="display:inline-flex; align-items:center; gap:8px; min-height:48px; padding:0 20px; border-radius:10px; border:1px solid #ECECEF; background:#ECECEF; color:#0A0A0C; font:inherit; font-weight:600; font-size:14px; cursor:pointer;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg>
+            <span>Find matching emails</span>
+          </button>
+        </div>
+        <p style="margin:0; font-size:12.5px; color:#8A8A96; line-height:1.6;">In this prototype Omnia matches on keywords. The real version reads each email and judges it with AI.</p>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isNewResults }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:20px; margin-top:24px;">
+        <sc-if value="{{ hasMatches }}" hint-placeholder-val="{{ true }}">
+          <div style="border-top:1px solid #1C1C21;">
+            <sc-for list="{{ matchRows }}" as="m" hint-placeholder-count="3">
+              <button class="row" onClick="{{ m.toggle }}" aria-pressed="{{ m.pressed }}" style="width:100%; box-sizing:border-box; display:flex; align-items:flex-start; gap:14px; text-align:left; min-height:44px; padding:14px 16px; background:transparent; border:0; border-bottom:1px solid #1C1C21; color:#ECECEF; font:inherit; cursor:pointer;">
+                <span style="flex:0 0 auto; display:flex; align-items:center; justify-content:center; width:22px; height:22px; margin-top:1px; box-sizing:border-box; border-radius:6px; border:1.5px solid {{ m.boxBorder }}; background:{{ m.boxBg }}; color:#0A0A0C;">
+                  <sc-if value="{{ m.on }}" hint-placeholder-val="{{ true }}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </sc-if>
+                </span>
+                <span style="display:flex; flex-direction:column; gap:4px; min-width:0; flex:1 1 auto;">
+                  <span style="font-weight:600;">{{ m.from }}</span>
+                  <span style="font-weight:500;">{{ m.subject }}</span>
+                  <span style="display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:#8A8A96;">
+                    <span style="color:{{ m.strengthColor }};">{{ m.strength }}</span>
+                    <span>{{ m.why }}</span>
+                    <span>{{ m.currently }}</span>
+                  </span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noMatches }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:20px 16px; border:1px solid #1F1F25; border-radius:14px; background:#101013; color:#A0A0AB;">{{ noMatchText }}</div>
+        </sc-if>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button onClick="{{ createGroup }}" style="display:inline-flex; align-items:center; min-height:48px; padding:0 20px; border-radius:10px; border:1px solid #ECECEF; background:#ECECEF; color:#0A0A0C; font:inherit; font-weight:600; font-size:14px; cursor:pointer;">{{ createLabel }}</button>
+          <button class="btn" onClick="{{ backToForm }}" style="display:inline-flex; align-items:center; min-height:48px; padding:0 20px; border-radius:10px; border:1px solid #2B2B33; background:#16161A; color:#ECECEF; font:inherit; font-weight:500; font-size:14px; cursor:pointer;">Start over</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showList }}" hint-placeholder-val="{{ true }}">
+    <h2 style="margin:32px 0 10px; font-size:13px; font-weight:500; color:#8A8A96;">{{ listTitle }}</h2>
+    <div style="border-bottom:1px solid #1C1C21;">
+      <sc-for list="{{ rows }}" as="item" hint-placeholder-count="4">
+        <div style="border-top:1px solid #1C1C21;">
+          <button class="row" onClick="{{ item.toggle }}" aria-expanded="{{ item.expanded }}" style="width:100%; box-sizing:border-box; display:flex; flex-direction:column; gap:6px; text-align:left; min-height:44px; padding:14px 16px; background:transparent; border:0; color:#ECECEF; font:inherit; cursor:pointer;">
+            <span style="display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; width:100%;">
+              <span style="font-weight:600;">{{ item.from }}</span>
+              <sc-if value="{{ item.showAttn }}" hint-placeholder-val="{{ false }}">
+                <span style="display:inline-flex; align-items:center; padding:1px 9px; border:1px solid #3A3320; background:#1A160C; color:#F2C879; border-radius:999px; font-size:12px;">Needs you</span>
+              </sc-if>
+              <span style="margin-left:auto; display:inline-flex; align-items:center; gap:8px; font-size:12.5px; color:#8A8A96;">
+                <span>{{ item.time }}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex:0 0 auto; transform:rotate({{ item.chevRot }}deg);"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </span>
+            </span>
+            <span style="display:block; font-weight:500; color:{{ item.subjectColor }}; text-decoration:{{ item.deco }};">{{ item.subject }}</span>
+            <span style="display:block; font-size:13px; color:{{ item.summaryColor }};">{{ item.summary }}</span>
+            <span style="display:flex; flex-wrap:wrap; align-items:center; gap:4px 14px; font-size:12px; color:#8A8A96;">
+              <sc-if value="{{ item.showGroup }}" hint-placeholder-val="{{ true }}">
+                <span style="display:inline-flex; align-items:center; gap:6px;">
+                  <span style="width:7px; height:7px; border-radius:50%; background:{{ item.color }};"></span>
+                  <span>{{ item.groupName }}</span>
+                </span>
+              </sc-if>
+              <sc-if value="{{ item.hasDue }}" hint-placeholder-val="{{ true }}">
+                <span>{{ item.dueLabel }}</span>
+              </sc-if>
+              <sc-if value="{{ item.showReminder }}" hint-placeholder-val="{{ false }}">
+                <span style="color:{{ item.ac }};">Reminder on</span>
+              </sc-if>
+              <sc-if value="{{ item.showDone }}" hint-placeholder-val="{{ false }}">
+                <span>Done</span>
+              </sc-if>
+            </span>
+          </button>
+
+          <sc-if value="{{ item.open }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:16px; padding:2px 16px 20px;">
+              <div style="padding:12px 14px; background:#0E0E11; border:1px solid #1C1C21; border-radius:10px; color:#B4B4BE; font-size:13px; line-height:1.6; white-space:pre-line;">{{ item.body }}</div>
+              <sc-if value="{{ item.hasLink }}" hint-placeholder-val="{{ true }}">
+                <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer" style="align-self:flex-start; display:inline-flex; align-items:center; min-height:44px; padding:0 2px; color:{{ item.ac }}; font-weight:500; font-size:13.5px; text-decoration:none;">Open in Gmail ↗</a>
+              </sc-if>
+              <sc-if value="{{ item.hasAction }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:13px; color:#A0A0AB;">{{ item.actionLine }}</div>
+              </sc-if>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <button class="btn" onClick="{{ item.toggleReminder }}" style="display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 16px; border-radius:10px; border:1px solid {{ item.remBorder }}; background:#16161A; color:{{ item.remColor }}; font:inherit; font-weight:500; font-size:13.5px; cursor:pointer;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path><path d="M10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+                  <span>{{ item.reminderLabel }}</span>
+                </button>
+                <button class="btn" onClick="{{ item.toggleDone }}" style="display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 16px; border-radius:10px; border:1px solid {{ item.doneBorder }}; background:{{ item.doneBg }}; color:{{ item.doneFg }}; font:inherit; font-weight:500; font-size:13.5px; cursor:pointer;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <span>{{ item.doneLabel }}</span>
+                </button>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="font-size:12.5px; color:#8A8A96;">{{ item.filedNote }}</div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                  <sc-for list="{{ item.moveOptions }}" as="opt" hint-placeholder-count="7">
+                    <button class="btn" onClick="{{ opt.pick }}" style="display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 14px; border-radius:999px; border:1px solid {{ opt.border }}; background:{{ opt.bg }}; color:{{ opt.fg }}; font:inherit; font-weight:500; font-size:13px; cursor:pointer;">
+                      <span style="width:8px; height:8px; border-radius:50%; background:{{ opt.color }};"></span>
+                      <span>{{ opt.name }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ item.wasMoved }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:13px; color:{{ item.ac }};">{{ item.movedNote }}</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+      <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:28px 16px; color:#8A8A96;">{{ emptyText }}</div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:28px;">
+      <p style="margin:0; font-size:12.5px; color:#8A8A96;">{{ footNote }}</p>
+      <button class="btn" onClick="{{ refresh }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 16px; border-radius:10px; border:1px solid #2B2B33; background:#16161A; color:#D0D0D8; font:inherit; font-weight:500; font-size:13px; cursor:pointer;">{{ refreshLabel }}</button>
+      <button class="btn" onClick="{{ resetAll }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 16px; border-radius:10px; border:1px solid #2B2B33; background:#16161A; color:#D0D0D8; font:inherit; font-weight:500; font-size:13px; cursor:pointer;">Reset my changes</button>
+      <button class="btn" onClick="{{ disconnect }}" style="display:inline-flex; align-items:center; min-height:44px; padding:0 16px; border-radius:10px; border:1px solid #2B2B33; background:#16161A; color:#D0D0D8; font:inherit; font-weight:500; font-size:13px; cursor:pointer;">Disconnect</button>
+    </div>
+
+  </main>
+</div>
+</template>
+<script>
+// Omnia sorter: Gmail message metadata in, groups out. Pure functions: no network, no storage.
+(function (root) {
+  "use strict";
+
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var NAMED = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", hellip: "…", rsquo: "’", lsquo: "‘", rdquo: "”", ldquo: "“", ndash: "–", mdash: "—", pound: "£", euro: "€" };
+
+  // ---- text helpers
+  function decodeEntities(s) {
+    return String(s).replace(/&(#x[0-9a-f]+|#[0-9]+|[a-z]+);/gi, function (m, e) {
+      if (e.charAt(0) === "#") {
+        var hex = e.charAt(1).toLowerCase() === "x";
+        var code = parseInt(e.slice(hex ? 2 : 1), hex ? 16 : 10);
+        if (!(code > 0 && code <= 0x10ffff)) return m;
+        try { return String.fromCodePoint(code); } catch (err) { return m; }
+      }
+      var v = NAMED[e.toLowerCase()];
+      return v === undefined ? m : v;
+    });
+  }
+
+  // zero-width and other invisible characters, built from code points so the source stays plain
+  var INVISIBLE = new RegExp("[" + [[0x200B, 0x200F], [0x2028, 0x202E], [0x2060, 0x206F], [0xFEFF, 0xFEFF], [0x034F, 0x034F], [0x00AD, 0x00AD]].map(function (r) { return String.fromCharCode(r[0]) + "-" + String.fromCharCode(r[1]); }).join("") + "]", "g");
+
+  function cleanText(s) {
+    return decodeEntities(s || "")
+      .replace(INVISIBLE, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // RFC 2047 words such as =?UTF-8?B?...?= (Gmail usually decodes these already)
+  function decodeWords(s) {
+    return String(s)
+      .replace(/(\?=)\s+(=\?)/g, "$1$2")
+      .replace(/=\?([\w-]+)\?([bq])\?([^?]*)\?=/gi, function (m, cs, enc, txt) {
+        try {
+          var bytes = [];
+          var i;
+          if (enc.toLowerCase() === "b") {
+            var bin = atob(txt);
+            for (i = 0; i < bin.length; i++) bytes.push(bin.charCodeAt(i));
+          } else {
+            txt = txt.replace(/_/g, " ");
+            for (i = 0; i < txt.length; i++) {
+              if (txt.charAt(i) === "=" && /^[0-9a-f]{2}$/i.test(txt.substr(i + 1, 2))) {
+                bytes.push(parseInt(txt.substr(i + 1, 2), 16));
+                i += 2;
+              } else bytes.push(txt.charCodeAt(i) & 255);
+            }
+          }
+          return new TextDecoder(cs).decode(new Uint8Array(bytes));
+        } catch (e) {
+          return m;
+        }
+      });
+  }
+
+  var SLD = { co: 1, com: 1, org: 1, net: 1, ac: 1, gov: 1, edu: 1, sch: 1, ltd: 1, plc: 1, nhs: 1 };
+  var WEBMAIL = /^(?:gmail|googlemail|outlook|hotmail|live|msn|yahoo|ymail|icloud|me|aol|proton|protonmail|btinternet|sky|talktalk|virginmedia|gmx|mail)$/;
+
+  function orgOf(domain) {
+    var p = String(domain || "").split(".").filter(Boolean);
+    var n = p.length;
+    if (n < 2) return p[0] || "";
+    if (n >= 3 && p[n - 1].length === 2 && SLD[p[n - 2]]) return p[n - 3];
+    return p[n - 2];
+  }
+
+  function titleCase(s) {
+    return String(s).replace(/[-_.]+/g, " ").replace(/\b[a-z]/g, function (c) { return c.toUpperCase(); }).trim();
+  }
+
+  function parseFrom(raw) {
+    raw = decodeWords(raw || "").trim();
+    var name = "";
+    var addr = "";
+    var m = /^(.*?)\s*<([^<>]*)>\s*$/.exec(raw);
+    if (m) { name = m[1]; addr = m[2]; }
+    else if (raw.indexOf("@") !== -1 && !/\s/.test(raw)) addr = raw;
+    else name = raw;
+    name = cleanText(name.replace(/^\s*"(.*)"\s*$/, "$1"));
+    if (name.indexOf("@") !== -1) name = "";
+    addr = addr.trim().toLowerCase();
+    var at = addr.lastIndexOf("@");
+    var local = at > 0 ? addr.slice(0, at) : addr;
+    var domain = at > 0 ? addr.slice(at + 1) : "";
+    return { name: name, addr: addr, local: local, domain: domain, org: orgOf(domain) };
+  }
+
+  function displayName(f) {
+    if (f.name) return f.name;
+    if (f.org && !WEBMAIL.test(f.org)) return titleCase(f.org);
+    return titleCase(f.local) || "Unknown sender";
+  }
+
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
+  function timeLabel(ms, now) {
+    if (!ms) return "";
+    var d = new Date(ms);
+    var n = new Date(now);
+    if (d.toDateString() === n.toDateString()) return pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+    var y = new Date(n.getTime());
+    y.setDate(n.getDate() - 1);
+    if (d.toDateString() === y.toDateString()) return "Yesterday";
+    var days = (n.getTime() - d.getTime()) / 864e5;
+    if (days >= 0 && days < 6) return WEEKDAYS[d.getDay()];
+    var s = d.getDate() + " " + MONTHS[d.getMonth()];
+    return d.getFullYear() === n.getFullYear() ? s : s + " " + d.getFullYear();
+  }
+
+  function clip(s, n) {
+    if (s.length <= n) return s;
+    var cut = s.slice(0, n);
+    var sp = cut.lastIndexOf(" ");
+    return (sp > n * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s,.;:-]+$/, "") + "…";
+  }
+
+  // ---- groups Omnia can find (a group only appears when at least two emails land in it)
+  var TEMPLATES = [
+    { id: "people", name: "People", desc: "Messages from real people, not companies.", color: "#F29CC9", tidy: false },
+    { id: "bookings", name: "Bookings & appointments", desc: "Reservations, tickets, invitations and appointments.", color: "#B8E27F", tidy: false },
+    { id: "money", name: "Money & bills", desc: "Invoices, payments, statements and bills.", color: "#8DDBB1", tidy: false },
+    { id: "study", name: "Study", desc: "Courses, lectures, assignments and school notices.", color: "#7FA8FF", tidy: false },
+    { id: "subs", name: "Subscriptions", desc: "Renewals, memberships and plans.", color: "#E2B77F", tidy: false },
+    { id: "orders", name: "Orders & deliveries", desc: "Purchases, receipts and delivery updates.", color: "#7FC8D8", tidy: true },
+    { id: "accounts", name: "Accounts & security", desc: "Sign-in alerts, codes and account notices.", color: "#C9A7E8", tidy: true },
+    { id: "social", name: "Social & updates", desc: "Notifications from social apps and communities.", color: "#7FD6C8", tidy: true },
+    { id: "promos", name: "Promotions & newsletters", desc: "Offers, newsletters and marketing mail.", color: "#A3A8C3", tidy: true }
+  ];
+  var OTHER = { id: "other", name: "Everything else", desc: "Emails Omnia could not place yet.", color: "#8A8A96", tidy: false };
+  var TIE_ORDER = ["accounts", "money", "orders", "bookings", "subs", "study", "social", "promos"];
+  var RULE_IDS = { bookings: 1, money: 1, study: 1, subs: 1, orders: 1, accounts: 1, social: 1, promos: 1 };
+  var CLUSTERABLE = { promos: 1, social: 1, other: 1 };
+  var CLUSTER_COLORS = ["#9AB8F2", "#E6B3A1", "#A5D6A7", "#CDB4F0", "#F0D98C", "#8FD3E8"];
+
+  // strong words count 3, weak words 1; a hit in the subject counts double
+  var RULES = {
+    orders: {
+      strong: /\byour (?:\S+ )?order\b|\border (?:confirm\w*|number|no\.?|#\s*\d|update|summary|dispatch\w*|has been|is on its way)|\b(?:des|dis)patched\b|\bshipped\b|\bshipping (?:confirmation|update)\b|\bout for delivery\b|\bwas delivered\b|\bhas been delivered\b|\bdelivery (?:update|confirmation|slot|attempt|notification|failed)\b|\btracking (?:number|link|information)\b|\btrack your\b|\bparcel\b|\byour package\b|\breturns? (?:label|received|request|confirmation)\b|\brefund(?:ed)?\b|\bon its way\b/i,
+      weak: /\breceipt\b|\bdelivery\b|\border\b|\bpurchase\b/i
+    },
+    bookings: {
+      strong: /\bbooking\b|\breservation\b|\bappointment\b|\bitinerary\b|\bcheck-?in\b|\bboarding pass\b|\bflights?\b|\be-?tickets?\b|\byour tickets?\b|\bconfirmed for\b|\byour table\b|\bviewing\b|\binvitation:|\bupdated invitation\b|\baccepted:|\bdeclined:|\bhotel\b|\bcheck-?out\b|\bcar hire\b|\bbooked\b|\bsee you (?:on|at)\b|\bmeeting\b/i,
+      weak: /\bconfirmed\b|\breminder\b|\bevent\b|\btrip\b|\bholiday\b|\bscheduled?\b|\bcalendar\b|\brsvp\b|\binvited?\b/i
+    },
+    money: {
+      strong: /\binvoices?\b|\bpayment (?:received|due|failed|reminder|confirmation|declined|unsuccessful|overdue|request)|\byour payment\b|\bstatement\b|\bdirect debit\b|\boverdue\b|\bbalance\b|\bbill\b|\btransaction\b|\bsalary\b|\bpayslip\b|\btax\b|\bhmrc\b|\bcredit score\b|\bloan\b|\bmortgage\b|\binsurance\b|\bcard ending\b|\bpay(?:ing)? (?:now|by|online)\b|\bamount due\b/i,
+      weak: /\bpayment\b|\bpaid\b|\bcharged?\b|\bbank\b/i
+    },
+    accounts: {
+      strong: /\bsecurity (?:alert|code|notice|update)\b|\bsign-?in\b|\bsigned in\b|\blog-?in\b|\bnew device\b|\bpassword\b|\bverification (?:code|link)\b|\bverify your\b|\bone-?time (?:code|passcode|password)\b|\b2-?step\b|\btwo-?factor\b|\bconfirm your (?:email|account|address)\b|\bactivate your\b|\baccount (?:recovery|created|locked|suspended|verification)\b|\bsuspicious\b|\bunusual activity\b|\bsecure your account\b|\bwelcome to\b|\bpasskey\b|\bget started with\b|\bsign-?up\b|\bregistration\b|\bsett?ing up\b|\bset up your\b|\bis yours\b/i,
+      weak: /\baccount\b|\bsecurity\b|\bprivacy\b|\bpolicy\b|\bterms\b|\bprofile\b/i
+    },
+    study: {
+      strong: /\bassignments?\b|\bcoursework\b|\bmodules?\b|\blectures?\b|\btutors?\b|\buniversity\b|\bcollege\b|\bexams?\b|\bsyllabus\b|\bmoodle\b|\bblackboard\b|\bstudents?\b|\bsemester\b|\bdissertation\b|\bseminar\b|\bhomework\b|\bturnitin\b|\bundergraduate\b|\bpostgraduate\b|\bstudy (?:notes|material|guide|group)\b|\brevision\b/i,
+      weak: /\bschool\b|\bcourse\b|\bfeedback\b|\blibrary\b|\bstudy\b|\bgrades?\b|\bacademic\b|\bnotes\b/i
+    },
+    subs: {
+      strong: /\bsubscription\b|\bsubscribed\b|\brenew(?:al|s|ed|ing)?\b|\bmembership\b|\bauto-?renew\w*\b|\bfree trial\b|\btrial (?:ends|ending|expires|period)\b|\bcancel(?:led|lation|ling)?\b|\bbilling (?:period|date|cycle|details)\b|\byour plan\b|\bpayment method\b|\bnext payment\b/i,
+      weak: /\bplan\b|\bupgrade\b|\bpremium\b/i
+    },
+    social: {
+      strong: /\bmentioned you\b|\bnew followers?\b|\bcommented on\b|\btagged you\b|\bliked your\b|\bfriend request\b|\bnew connection\b|\binvited you to (?:connect|join|follow)\b|\bsent you a (?:message|request)\b|\bwho viewed your profile\b|\breplied to your\b|\bstarted following\b/i,
+      weak: /\bposted\b|\bjoined\b|\bnotification\b|\bfollow(?:ers?)?\b|\bconnections?\b/i
+    },
+    promos: {
+      strong: /\b\d{1,3}\s?%|\bsale\b|\bdeals?\b|\boffers?\b|\bdiscounts?\b|\bsave\b|\bvouchers?\b|\bcoupons?\b|\bpromo(?:tion|tional|code)?\b|\blimited[- ]time\b|\blast chance\b|\bends (?:tonight|soon|today|sunday|monday|midnight|tomorrow)\b|\bfree (?:delivery|shipping|gift)\b|\bexclusive\b|\bnew in\b|\bshop now\b|\bdon'?t miss\b|\bbest[- ]sellers?\b|\bnew arrivals?\b|\bblack friday\b|\bcyber monday\b|\bjust for you\b|\bfrom [£$€]\s?\d|\bgiveaway\b|\brewards?\b|\bclaim your\b/i,
+      weak: /\bnewsletter\b|\bdigest\b|\bweekly\b|\bmonthly\b|\broundup\b|\bthis week\b|\bissue\b|\bedition\b|\bpodcast\b|\bread more\b|\bnew episode\b|\btop stories\b|\bwhat'?s new\b|\btips\b|\bnews\b|\bwebinar\b|\bjoin us\b|\bnew features?\b|\bintroducing\b|\bstreak\b/i
+    }
+  };
+
+  var DOMAIN_HINT = [
+    ["social", 4, /^(?:facebook(?:mail)?|instagram|linkedin|twitter|x|tiktok|reddit(?:mail)?|pinterest|discord(?:app)?|snapchat|whatsapp|youtube|quora|nextdoor|meetup|tumblr|telegram|threads|bsky|mastodon|strava|goodreads|medium)$/],
+    ["money", 3, /^(?:paypal|stripe|wise|monzo|revolut|starlingbank|barclays|hsbc|natwest|lloyds|lloydsbank|santander|nationwide|halifax|klarna|visa|mastercard|americanexpress|amex|experian|equifax|transunion|hmrc|moneysavingexpert|zopa|chase|capitalone|tide|gocardless)$/],
+    ["bookings", 3, /^(?:booking|airbnb|expedia|trainline|thetrainline|ryanair|easyjet|britishairways|jet2|tripadvisor|opentable|eventbrite|ticketmaster|skyscanner|lner|avanti|nationalrail|hotels|premierinn|travelodge|calendly|treatwell|fresha|resdiary)$/],
+    ["orders", 2, /^(?:amazon|ebay|etsy|royalmail|dpd|dpdlocal|evri|hermes|ups|fedex|dhl|parcelforce|yodel|asos|argos|aliexpress|temu|shein)$/]
+  ];
+
+  var AUTO_LOCAL = /^(?:no[-_.]?reply|do[-_.]?not[-_.]?reply|donotreply|notifications?|notify|alerts?|mailer(?:-daemon)?|bounces?|news(?:letters?)?|marketing|offers?|promo(?:tion)?s?|updates?|support|help|hello|hi|team|info|contact|contactus|service|services|billing|invoices?|orders?|receipts?|accounts?|security|admin|system|customer(?:care|service|support|s)?|careers|jobs|bookings?|reservations?|reply|auto(?:mated)?|digest|postmaster|enquiries|enquiry|sales|store|shop|rewards|members?|membership|community|events?|press|feedback|welcome|confirm(?:ation)?s?|mail|email|comms|communications?|campaigns?)(?:[-_.+][a-z0-9._+-]*|\d+)?$/i;
+  var AUTO_LOCAL_ANY = /no[-_.]?reply|donotreply|notification|mailer|bounce|newsletter|automated|alert/i;
+  var AUTO_NAME =/\b(?:team|support|no-?reply|notifications?|customer|service|alerts?|news|newsletter|updates|help ?desk|bot|billing|rewards)\b/i;
+
+  var ACTION = /\baction required\b|\burgent(?:ly)?\b|\boverdue\b|\bfinal (?:reminder|notice|warning)\b|\bpayment (?:failed|due|declined|unsuccessful|required|overdue)\b|\bfailed payment\b|\bdue (?:on|by|today|tomorrow|soon|in)\b|\bdeadline\b|\brespond\b|\bplease (?:confirm|review|reply|respond|sign|complete|pay|check|call|send|provide|update)\b|\bconfirm (?:your|by|attendance)\b|\bexpires? (?:on|in|today|tomorrow|soon)\b|\bexpiring\b|\bexpired\b|\bverify your\b|\bsignature required\b|\bwe need (?:you|your|to)\b|\bresponse (?:needed|required)\b|\brsvp\b|\binvitation:|\bupdated invitation\b|\bsuspicious\b|\bunusual (?:activity|sign)|\baccount (?:locked|suspended)\b|\bunable to (?:deliver|process|renew)\b|\bdelivery failed\b|\bmissed (?:delivery|payment)\b|\bpast due\b/i;
+  var ACCOUNT_ACTION = /suspicious|unusual|locked|suspended|action required|urgent|expir|verify your|confirm your/i;
+  var CODE_MAIL = /\b(?:verification|security|one-?time|login|log-?in|sign-?in|confirmation) code\b|\bpasscode\b|\botp\b/i;
+
+  // ---- one message -> one tidy record
+  function header(msg, name) {
+    var hs = (msg.payload && msg.payload.headers) || [];
+    for (var i = 0; i < hs.length; i++) {
+      if (String(hs[i].name).toLowerCase() === name.toLowerCase()) return hs[i].value == null ? "" : String(hs[i].value);
+    }
+    return null;
+  }
+
+  function parseMessage(m) {
+    var labels = {};
+    (m.labelIds || []).forEach(function (l) { labels[l] = true; });
+    var from = parseFrom(header(m, "From") || "");
+    var subject = cleanText(decodeWords(header(m, "Subject") || "")) || "(no subject)";
+    var snippet = cleanText(m.snippet || "");
+    var hasUnsub = !!header(m, "List-Unsubscribe");
+    var prec = header(m, "Precedence") || "";
+    var autoSub = (header(m, "Auto-Submitted") || "").trim();
+    var bulk = hasUnsub || /\b(?:bulk|list|junk)\b/i.test(prec) || !!labels.CATEGORY_PROMOTIONS || !!labels.CATEGORY_FORUMS;
+    var auto = bulk || (!!autoSub && !/^no$/i.test(autoSub)) || !!labels.CATEGORY_UPDATES || !!labels.CATEGORY_SOCIAL ||
+      AUTO_LOCAL.test(from.local) || AUTO_LOCAL_ANY.test(from.local) || AUTO_NAME.test(from.name);
+    var ts = Number(m.internalDate) || Date.parse(header(m, "Date") || "") || 0;
+    return {
+      id: String(m.id),
+      threadId: String(m.threadId || m.id),
+      ts: ts,
+      from: from,
+      who: displayName(from),
+      subject: subject,
+      snippet: snippet,
+      labels: labels,
+      unread: !!labels.UNREAD,
+      starred: !!labels.STARRED,
+      hasUnsub: hasUnsub,
+      bulk: bulk,
+      auto: auto,
+      people: !auto
+    };
+  }
+
+  function score(it) {
+    var s = {};
+    TIE_ORDER.forEach(function (g) { s[g] = 0; });
+    var subj = it.subject.toLowerCase();
+    var rest = (it.snippet + " " + it.from.name + " " + it.from.domain).toLowerCase();
+    Object.keys(RULES).forEach(function (g) {
+      [[3, RULES[g].strong], [1, RULES[g].weak]].forEach(function (p) {
+        if (!p[1]) return;
+        if (p[1].test(subj)) s[g] += p[0] * 2;
+        else if (p[1].test(rest)) s[g] += p[0];
+      });
+    });
+    if (it.labels.CATEGORY_PROMOTIONS) s.promos += 4;
+    if (it.labels.CATEGORY_SOCIAL) s.social += 4;
+    if (it.labels.CATEGORY_UPDATES) { s.orders += 1; s.bookings += 1; s.money += 1; s.accounts += 1; s.subs += 1; }
+    if (it.hasUnsub) s.promos += 1;
+    DOMAIN_HINT.forEach(function (h) { if (h[2].test(it.from.org)) s[h[0]] += h[1]; });
+    var best = null;
+    TIE_ORDER.forEach(function (g) { if (best === null || s[g] > s[best]) best = g; });
+    return s[best] >= 2 ? { gid: best, score: s[best] } : null;
+  }
+
+  function classify(it) {
+    if (it.people) return { gid: "people", score: 9 };
+    var r = score(it);
+    if (r) return r;
+    return { gid: it.bulk ? "promos" : "other", score: 0 };
+  }
+
+  function needsYou(it) {
+    if (it.starred) return true;
+    if (!it.unread) return false;
+    if (it.people) return true;
+    if (it.gid0 === "promos" || it.gid0 === "social") return false;
+    var text = it.subject + " " + it.snippet;
+    if (CODE_MAIL.test(text)) return false;
+    return (it.gid0 === "accounts" ? ACCOUNT_ACTION : ACTION).test(text);
+  }
+
+  function suggest(it) {
+    var text = it.subject + " " + it.snippet;
+    switch (it.gid0) {
+      case "people": return "Reply to " + (it.who.length <= 28 ? it.who : it.who.split(" ")[0]);
+      case "accounts": return "Check your account";
+      case "money": return "Check the payment";
+      case "orders": return "Check your delivery";
+      case "bookings": return /invit|rsvp/i.test(text) ? "Reply to the invitation" : "Check the details";
+      case "study": return "Check what is needed";
+      case "subs": return "Check your plan";
+      default: return "Open it and decide";
+    }
+  }
+
+  function clusterName(list, org) {
+    var tally = {};
+    var first = null;
+    list.forEach(function (it) {
+      var n = it.who.replace(/\s+(?:team|news|newsletter|updates?|notifications?|support|no-?reply)$/i, "").trim();
+      if (!n) return;
+      var k = n.toLowerCase();
+      tally[k] = tally[k] || { n: n, c: 0 };
+      tally[k].c += 1;
+      if (first === null) first = k;
+    });
+    var best = null;
+    Object.keys(tally).forEach(function (k) { if (best === null || tally[k].c > tally[best].c) best = k; });
+    var name = best ? tally[best].n : titleCase(org);
+    return name.length > 24 ? name.slice(0, 24).trim() : name;
+  }
+
+  function sortMessages(msgs, opts) {
+    opts = opts || {};
+    var now = opts.now || Date.now();
+    var account = opts.account || "";
+    var items = (msgs || []).filter(function (m) { return m && m.id; }).map(parseMessage);
+    items.sort(function (a, b) { return b.ts - a.ts; });
+
+    items.forEach(function (it) {
+      var c = classify(it);
+      it.gid = c.gid;
+      it.gid0 = c.gid;
+    });
+    items.forEach(function (it) {
+      it.attention = needsYou(it);
+      it.action = it.attention ? suggest(it) : "";
+    });
+
+    // Sender groups: three or more emails from one company that no other group claimed
+    var byOrg = {};
+    items.forEach(function (it) {
+      if (it.people || !CLUSTERABLE[it.gid] || !it.from.org || WEBMAIL.test(it.from.org)) return;
+      (byOrg[it.from.org] = byOrg[it.from.org] || []).push(it);
+    });
+    var made = [];
+    Object.keys(byOrg).forEach(function (org) {
+      var list = byOrg[org];
+      if (list.length < 3) return;
+      made.push({ org: org, list: list });
+    });
+    made.sort(function (a, b) { return b.list.length - a.list.length || (a.org < b.org ? -1 : 1); });
+    var clusters = made.map(function (c, i) {
+      var name = clusterName(c.list, c.org);
+      var id = "org-" + (c.org.replace(/[^a-z0-9]/g, "").slice(0, 24) || "sender");
+      c.list.forEach(function (it) { it.gid = id; });
+      return { id: id, name: name, desc: "Emails from " + name + ".", color: CLUSTER_COLORS[i % CLUSTER_COLORS.length], tidy: true };
+    });
+
+    // A rule group needs at least two emails to count as a group Omnia found
+    var counts = {};
+    items.forEach(function (it) { counts[it.gid] = (counts[it.gid] || 0) + 1; });
+    items.forEach(function (it) { if (RULE_IDS[it.gid] && counts[it.gid] < 2) it.gid = "other"; });
+    counts = {};
+    items.forEach(function (it) { counts[it.gid] = (counts[it.gid] || 0) + 1; });
+
+    var templates = TEMPLATES.concat(clusters).concat([OTHER]).map(function (g) {
+      return { id: g.id, name: g.name, desc: g.desc, color: g.color, tidy: g.tidy, count: counts[g.id] || 0 };
+    });
+
+    var emails = items.map(function (it) {
+      var link = "https://mail.google.com/mail/" + (account ? "?authuser=" + encodeURIComponent(account) : "") + "#all/" + encodeURIComponent(it.threadId);
+      return {
+        id: it.id,
+        threadId: it.threadId,
+        time: timeLabel(it.ts, now),
+        ts: it.ts,
+        from: it.who,
+        subject: it.subject,
+        group: it.gid,
+        attention: it.attention,
+        due: null,
+        dueLabel: "",
+        action: it.action,
+        summary: clip(it.snippet, 150) || "No preview available.",
+        body: it.snippet || "No preview available. Open the email in Gmail to read it.",
+        unread: it.unread,
+        starred: it.starred,
+        link: link
+      };
+    });
+
+    var groups = templates.filter(function (g) { return g.count > 0; });
+    return {
+      groups: groups,
+      templates: templates,
+      emails: emails,
+      stats: {
+        total: emails.length,
+        unread: emails.filter(function (e) { return e.unread; }).length,
+        attention: emails.filter(function (e) { return e.attention; }).length,
+        groups: groups.length
+      }
+    };
+  }
+
+  var api = {
+    sortMessages: sortMessages,
+    _t: { decodeEntities: decodeEntities, cleanText: cleanText, decodeWords: decodeWords, parseFrom: parseFrom, orgOf: orgOf, timeLabel: timeLabel, clip: clip }
+  };
+  root.OmniaSort = api;
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+(function () {
+  "use strict";
+
+  // ---- Saved choices: kept in this browser only (localStorage), never sent anywhere
+  var STORE_KEY = "omnia-app-v1";
+  var BOOL_MAPS = ["rem", "done", "tidy"];
+  var STR_MAPS = ["moved", "merged", "names"];
+
+  function cleanMap(src, kind) {
+    var out = {};
+    if (!src || typeof src !== "object" || Array.isArray(src)) return out;
+    Object.keys(src).slice(0, 500).forEach(function (k) {
+      var v = src[k];
+      if (kind === "bool" && typeof v === "boolean") out[k] = v;
+      if (kind === "str" && typeof v === "string" && v.length <= 40) out[k] = v;
+    });
+    return out;
+  }
+
+  function restore() {
+    var out = {};
+    try {
+      var raw = window.localStorage.getItem(STORE_KEY);
+      if (!raw) return out;
+      var data = JSON.parse(raw);
+      if (!data || typeof data !== "object") return out;
+      BOOL_MAPS.forEach(function (k) { out[k] = cleanMap(data[k], "bool"); });
+      STR_MAPS.forEach(function (k) { out[k] = cleanMap(data[k], "str"); });
+      out.custom = (Array.isArray(data.custom) ? data.custom : []).slice(0, 20).filter(function (c) {
+        return c && typeof c.id === "string" && /^custom\d+$/.test(c.id) &&
+          typeof c.name === "string" && typeof c.color === "string" && /^#[0-9a-fA-F]{3,8}$/.test(c.color);
+      }).map(function (c) {
+        return { id: c.id, name: c.name.slice(0, 24), desc: typeof c.desc === "string" ? c.desc.slice(0, 200) : "", color: c.color };
+      });
+    } catch (e) {
+      return {};
+    }
+    return out;
+  }
+
+  function persist(state) {
+    try {
+      var out = {};
+      BOOL_MAPS.concat(STR_MAPS).concat(["custom"]).forEach(function (k) {
+        if (state[k] !== undefined) out[k] = state[k];
+      });
+      window.localStorage.setItem(STORE_KEY, JSON.stringify(out));
+    } catch (e) {
+      // storage blocked: the demo still works, it just forgets on reload
+    }
+  }
+
+  // ---- Base class the page logic extends
+  var pending = false;
+  function schedule() {
+    if (pending) return;
+    pending = true;
+    Promise.resolve().then(function () {
+      pending = false;
+      render();
+    });
+  }
+
+  class DCLogic {
+    constructor() {
+      this.props = { accent: "#A5B4FF" };
+      this.state = {};
+    }
+    setState(s) {
+      this.state = Object.assign({}, this.state, s);
+      persist(this.state);
+      schedule();
+    }
+  }
+
+  class Component extends DCLogic {
+  baseGroups() {
+    return [
+      { id: "people", name: "People", desc: "Messages from friends, family and colleagues.", color: "#F29CC9", tidy: false },
+      { id: "study", name: "Study", desc: "Course updates, feedback and library notices.", color: "#7FA8FF", tidy: false },
+      { id: "bookings", name: "Bookings & appointments", desc: "Confirmed visits, services and reservations.", color: "#B8E27F", tidy: false },
+      { id: "subs", name: "Subscriptions", desc: "Renewals, cancellations and plans that are ending.", color: "#E2B77F", tidy: false },
+      { id: "orders", name: "Orders & deliveries", desc: "Purchases, receipts and delivery updates.", color: "#7FC8D8", tidy: true },
+      { id: "accounts", name: "Accounts & security", desc: "Sign-in alerts and account notices.", color: "#C9A7E8", tidy: true },
+      { id: "promos", name: "Promotions & offers", desc: "Sales, vouchers and newsletters from shops, food apps and games.", color: "#A3A8C3", tidy: true }
+    ];
+  }
+
+  groups() {
+    const st = this.state || {};
+    const names = st.names || {};
+    const tidyMap = st.tidy || {};
+    const merged = st.merged || {};
+    const custom = (st.custom || []).map((c) => ({ id: c.id, name: c.name, desc: c.desc || "A group you made.", color: c.color, tidy: false }));
+    return this.baseGroups().concat(custom)
+      .filter((g) => !merged[g.id])
+      .map((g) => ({
+        id: g.id,
+        name: names[g.id] || g.name,
+        desc: g.desc,
+        color: g.color,
+        tidy: Object.prototype.hasOwnProperty.call(tidyMap, g.id) ? !!tidyMap[g.id] : !!g.tidy
+      }));
+  }
+
+  resolve(id) {
+    const merged = (this.state && this.state.merged) || {};
+    let g = id;
+    let n = 0;
+    while (merged[g] && n < 20) {
+      g = merged[g];
+      n += 1;
+    }
+    return g;
+  }
+
+  setMap(key, id, val) {
+    const cur = (this.state && this.state[key]) || {};
+    this.setState({ [key]: Object.assign({}, cur, { [id]: val }) });
+  }
+
+  synonyms() {
+    const food = ["pizza", "burger", "grocery", "takeaway", "restaurant", "meal", "voucher"];
+    const gaming = ["game", "gaming", "controller", "console", "season", "rewards"];
+    const travel = ["train", "rail", "flight", "hotel", "trip", "airport", "holiday", "ticket"];
+    const money = ["receipt", "payment", "refund", "invoice", "bill", "price", "discount", "£"];
+    const health = ["dental", "dentist", "optician", "eye", "doctor", "medical", "check-up", "surgery"];
+    const school = ["module", "coursework", "feedback", "library", "study", "lecture"];
+    return {
+      food: food, eating: food, takeaway: food, grocery: food,
+      gaming: gaming, game: gaming, games: gaming,
+      travel: travel, train: travel, holiday: travel, trip: travel,
+      money: money, finance: money, bill: money, payment: money, shopping: money,
+      health: health, medical: health, dental: health,
+      school: school, study: school, uni: school, university: school
+    };
+  }
+
+  keywordsFor(name, desc) {
+    const stop = ["the", "and", "for", "with", "any", "all", "anything", "stuff", "things", "related", "about", "that", "this", "from", "emails", "email", "your", "are", "has", "have", "etc", "like", "such", "also", "other", "just", "some"];
+    const raw = (name + " " + desc).toLowerCase().split(/[^a-z0-9£-]+/).filter((w) => w.length > 2 && stop.indexOf(w) === -1);
+    const own = [];
+    raw.forEach((w) => {
+      let stem = w;
+      if (w.length > 4 && w.slice(-3) === "ies") stem = w.slice(0, -3) + "y";
+      else if (w.length > 4 && w.slice(-1) === "s" && !/(ss|us|is)$/.test(w)) stem = w.slice(0, -1);
+      if (own.indexOf(stem) === -1) own.push(stem);
+    });
+    const syn = this.synonyms();
+    const related = [];
+    own.forEach((w) => {
+      Object.keys(syn).forEach((k) => {
+        if (w === k || (w.length > 3 && k.indexOf(w) === 0) || (k.length > 3 && w.indexOf(k) === 0)) {
+          syn[k].forEach((s) => { if (related.indexOf(s) === -1) related.push(s); });
+        }
+      });
+    });
+    return { own: own, related: related };
+  }
+
+  hasWord(text, w) {
+    if (w === "£") return text.indexOf("£") !== -1;
+    const esc = w.replace(/[^a-z0-9-]/g, "");
+    if (!esc) return false;
+    const body = esc.length > 3 && esc.slice(-1) === "y" ? esc.slice(0, -1) + "(?:y|ies)" : esc;
+    return new RegExp("\\b" + body + (esc.length <= 3 ? "\\b" : "")).test(text);
+  }
+
+  scanEmails(name, desc) {
+    const kw = this.keywordsFor(name, desc);
+    const all = kw.own.concat(kw.related.filter((w) => kw.own.indexOf(w) === -1));
+    const out = [];
+    this.emailData().forEach((e) => {
+      const text = (e.subject + " " + e.summary).toLowerCase();
+      const matched = all.filter((w) => this.hasWord(text, w));
+      if (matched.length) {
+        out.push({ id: e.id, why: "Mentions " + matched.slice(0, 3).join(", "), strong: matched.length >= 2, score: matched.length });
+      }
+    });
+    out.sort((a, b) => b.score - a.score);
+    return out;
+  }
+
+  readField(id) {
+    try {
+      const el = document.getElementById(id);
+      return el && typeof el.value === "string" ? el.value : "";
+    } catch (err) {
+      return "";
+    }
+  }
+
+  fillExample(name, desc) {
+    try {
+      const a = document.getElementById("area-name");
+      const b = document.getElementById("area-desc");
+      if (a) a.value = name;
+      if (b) b.value = desc;
+    } catch (err) {
+      // ignore
+    }
+  }
+
+  goTo(view) {
+    this.setState({ view: view, open: null, notice: "", panel: null, panelError: "" });
+  }
+
+  openNew() {
+    this.setState({ view: "new", stage: "form", draft: null, formError: "", notice: "", open: null, panel: null, panelError: "" });
+  }
+
+  backToForm() {
+    this.setState({ stage: "form", draft: null, formError: "" });
+  }
+
+  nameTaken(name, exceptId) {
+    return this.groups().some((g) => g.id !== exceptId && g.name.toLowerCase() === name.toLowerCase());
+  }
+
+  findMatches() {
+    const name = this.readField("area-name").trim().slice(0, 24);
+    const desc = this.readField("area-desc").trim().slice(0, 200);
+    if (!name) {
+      this.setState({ formError: "Give your group a name first." });
+      return;
+    }
+    if (this.nameTaken(name, "")) {
+      this.setState({ formError: "You already have a group called " + name + "." });
+      return;
+    }
+    const found = this.scanEmails(name, desc);
+    const picks = {};
+    const why = {};
+    const strong = {};
+    found.forEach((f) => { picks[f.id] = true; why[f.id] = f.why; strong[f.id] = f.strong; });
+    this.setState({
+      stage: "results",
+      formError: "",
+      draft: { name: name, desc: desc, ids: found.map((f) => f.id), picks: picks, why: why, strong: strong }
+    });
+  }
+
+  togglePick(eid) {
+    const d = (this.state && this.state.draft) || null;
+    if (!d) return;
+    this.setState({ draft: Object.assign({}, d, { picks: Object.assign({}, d.picks, { [eid]: !d.picks[eid] }) }) });
+  }
+
+  createGroup() {
+    const st = this.state || {};
+    const d = st.draft;
+    if (!d) return;
+    const custom = st.custom || [];
+    const palette = ["#FF8F8F", "#6FD3EE", "#D9C8A5", "#E59BF0", "#F5A36B"];
+    const id = "custom" + (custom.length + 1);
+    const area = { id: id, name: d.name, color: palette[custom.length % palette.length], desc: d.desc };
+    const moved = Object.assign({}, st.moved || {});
+    let n = 0;
+    d.ids.forEach((eid) => {
+      if (d.picks[eid]) { moved[eid] = id; n += 1; }
+    });
+    const notice = n > 0
+      ? "Created " + d.name + " and filed " + n + (n === 1 ? " email" : " emails") + " in it. Omnia will keep filing new matching emails here."
+      : "Created " + d.name + ". Omnia will file matching emails here as they arrive.";
+    this.setState({ custom: custom.concat([area]), moved: moved, view: id, stage: "form", draft: null, formError: "", open: null, notice: notice, panel: null });
+  }
+
+  toggleTidy(gid, now) {
+    this.setMap("tidy", gid, !now);
+  }
+
+  startRename() {
+    this.setState({ panel: "rename", panelError: "" });
+  }
+
+  startMerge() {
+    this.setState({ panel: "merge", panelError: "" });
+  }
+
+  cancelPanel() {
+    this.setState({ panel: null, panelError: "" });
+  }
+
+  saveRename(gid) {
+    const name = this.readField("rename-input").trim().slice(0, 24);
+    if (!name) {
+      this.setState({ panelError: "Type a name first." });
+      return;
+    }
+    if (this.nameTaken(name, gid)) {
+      this.setState({ panelError: "You already have a group called " + name + "." });
+      return;
+    }
+    const names = Object.assign({}, (this.state && this.state.names) || {}, { [gid]: name });
+    this.setState({ names: names, panel: null, panelError: "", notice: "Renamed to " + name + "." });
+  }
+
+  mergeInto(fromId, toId, fromName, toName) {
+    const merged = Object.assign({}, (this.state && this.state.merged) || {}, { [fromId]: toId });
+    this.setState({ merged: merged, view: toId, panel: null, panelError: "", open: null, notice: "Merged " + fromName + " into " + toName + "." });
+  }
+
+  resetAll() {
+    this.setState({
+      view: "overview", open: null, moved: {}, rem: {}, done: {}, tidy: {}, names: {}, merged: {}, custom: [],
+      panel: null, panelError: "", notice: "", stage: "form", draft: null, formError: ""
+    });
+  }
+
+  renderVals() {
+    const st = this.state || {};
+    const moved = st.moved || {};
+    const rem = st.rem || {};
+    const done = st.done || {};
+    const stage = st.stage || "form";
+    const draft = st.draft || null;
+    const formError = st.formError || "";
+    const notice = st.notice || "";
+    const panel = st.panel || null;
+    const panelError = st.panelError || "";
+    const open = st.open || null;
+    const ac = (this.props && this.props.accent) || "#A5B4FF";
+    const groups = this.groups();
+    const gById = {};
+    groups.forEach((g) => { gById[g.id] = g; });
+    const special = ["overview", "reminders", "new"];
+    let view = st.view || "overview";
+    if (special.indexOf(view) === -1 && !gById[view]) view = "overview";
+    const isGroupView = special.indexOf(view) === -1;
+    const pl = (n, w) => n + " " + w + (n === 1 ? "" : "s");
+
+    const emails = this.emailData().map((e) => Object.assign({}, e, {
+      group: this.resolve(moved[e.id] || e.group),
+      reminder: Object.prototype.hasOwnProperty.call(rem, e.id) ? rem[e.id] : !!e.due,
+      done: !!done[e.id]
+    }));
+    const groupOf = (e) => gById[e.group] || groups[0];
+
+    const dueKey = (e) => e.due || "9999-12-31";
+    const byDue = (a, b) => (dueKey(a) < dueKey(b) ? -1 : dueKey(a) > dueKey(b) ? 1 : 0);
+    const doneLast = (a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0);
+    const live = (list) => list.filter((e) => !e.done);
+    const nextOf = (list) => live(list).filter((e) => e.due).sort(byDue)[0];
+    const attnOf = (list) => live(list).filter((e) => e.attention).length;
+
+    const tabDefs = [{ id: "overview", name: "Overview", color: "" }]
+      .concat(groups.map((g) => ({ id: g.id, name: g.name, color: g.color })))
+      .concat([{ id: "reminders", name: "Reminders", color: "" }]);
+    const tabs = tabDefs.map((t) => {
+      const sel = view === t.id;
+      let count = 0;
+      if (t.id === "reminders") count = live(emails.filter((e) => e.reminder)).length;
+      else if (t.id !== "overview") count = live(emails.filter((e) => e.group === t.id)).length;
+      return {
+        id: t.id,
+        name: t.name,
+        color: t.color,
+        hasDot: t.id !== "overview" && t.id !== "reminders",
+        hasCount: t.id !== "overview",
+        count: count,
+        bg: sel ? "#ECECEF" : "transparent",
+        fg: sel ? "#0A0A0C" : "#B4B4BE",
+        border: sel ? "#ECECEF" : "#26262D",
+        countFg: sel ? "#3A3A44" : "#8A8A96",
+        current: sel ? "page" : "false",
+        pick: () => this.goTo(t.id)
+      };
+    });
+    const newSel = view === "new";
+
+    const makeCard = (g) => {
+      const list = emails.filter((e) => e.group === g.id);
+      const attn = attnOf(list);
+      const nx = nextOf(list);
+      let foot = "";
+      let footColor = "#8A8A96";
+      if (attn > 0) {
+        foot = attn + (attn === 1 ? " needs you" : " need you");
+        footColor = "#F2C879";
+      } else if (nx) {
+        foot = "Next: " + nx.action + " · " + nx.dueLabel;
+      }
+      return {
+        id: g.id,
+        name: g.name,
+        desc: g.desc,
+        color: g.color,
+        countLabel: pl(live(list).length, "email"),
+        hasFoot: foot !== "",
+        foot: foot,
+        footColor: footColor,
+        pick: () => this.goTo(g.id)
+      };
+    };
+    const cards = groups.filter((g) => !g.tidy).map(makeCard);
+    const tidyCards = groups.filter((g) => g.tidy).map(makeCard);
+    const tidiedCount = live(emails.filter((e) => groupOf(e).tidy)).length;
+
+    let scope = emails;
+    let listEmails = [];
+    let title = "Your inbox";
+    let subtitle = "";
+    let listTitle = "";
+    let emptyText = "";
+    if (view === "overview") {
+      scope = emails;
+      listEmails = emails.filter((e) => e.attention).sort((a, b) => doneLast(a, b) || byDue(a, b));
+      subtitle = pl(emails.length, "email") + " sorted into " + pl(groups.length, "group") + " by Omnia";
+      listTitle = "Needs you";
+      emptyText = "Nothing needs you right now.";
+    } else if (view === "reminders") {
+      scope = emails.filter((e) => e.reminder);
+      listEmails = scope.slice().sort((a, b) => doneLast(a, b) || byDue(a, b));
+      title = "Reminders";
+      subtitle = pl(live(scope).length, "reminder") + ", set by Omnia from your emails";
+      listTitle = "Coming up";
+      emptyText = "No reminders yet. Open an email and tap Set reminder.";
+    } else if (view === "new") {
+      scope = [];
+      listEmails = [];
+      title = "New group";
+      subtitle = stage === "results" && draft ? "Reviewing matches for " + draft.name : "Name it, and tell Omnia what belongs there";
+    } else {
+      scope = emails.filter((e) => e.group === view);
+      listEmails = scope;
+      title = gById[view].name;
+      subtitle = pl(live(scope).length, "email") + " · " + gById[view].desc;
+      listTitle = "Latest";
+      emptyText = "Nothing here yet. Omnia will file matching emails here as they arrive.";
+    }
+
+    const attn = attnOf(scope);
+    const nx = nextOf(scope);
+    let digest = "";
+    if (view === "overview") {
+      digest = (attn > 0 ? attn + (attn === 1 ? " thing needs" : " things need") + " you." : "Nothing needs you right now.") +
+        (nx ? " Next up: " + nx.action + ", " + nx.dueLabel + "." : "") +
+        (tidiedCount > 0 ? " " + tidiedCount + (tidiedCount === 1 ? " email is" : " emails are") + " tidied away." : "");
+    } else if (view === "new") {
+      digest = stage === "results" && draft
+        ? "Omnia scanned " + pl(emails.length, "email") + " and found " + draft.ids.length + (draft.ids.length === 1 ? " possible match" : " possible matches") + ". Untick anything that does not belong."
+        : "Describe the group in your own words. Omnia will look through your emails and suggest what belongs.";
+    } else if (attn > 0) {
+      digest = attn + (attn === 1 ? " needs" : " need") + " you." + (nx ? " Next up: " + nx.action + ", " + nx.dueLabel + "." : "");
+    } else if (isGroupView && gById[view].tidy) {
+      digest = "Tidied away. Nothing in here needs you.";
+    } else if (nx) {
+      digest = "Nothing urgent. Next up: " + nx.action + ", " + nx.dueLabel + ".";
+    } else {
+      digest = "You are all caught up here.";
+    }
+
+    const picked = draft ? draft.ids.filter((id) => draft.picks[id]).length : 0;
+    const matchRows = view === "new" && stage === "results" && draft
+      ? draft.ids.map((eid) => {
+          const e = emails.find((x) => x.id === eid);
+          const on = !!draft.picks[eid];
+          const isStrong = !!draft.strong[eid];
+          return {
+            id: eid,
+            from: e.from,
+            subject: e.subject,
+            why: draft.why[eid],
+            strength: isStrong ? "Strong match" : "Possible match",
+            strengthColor: isStrong ? ac : "#A0A0AB",
+            currently: "Now in " + groupOf(e).name,
+            on: on,
+            pressed: on ? "true" : "false",
+            boxBg: on ? "#ECECEF" : "transparent",
+            boxBorder: on ? "#ECECEF" : "#4A4A55",
+            toggle: () => this.togglePick(eid)
+          };
+        })
+      : [];
+
+    const examples = [
+      { label: "Food", name: "Food & delivery", desc: "pizza, takeaways and groceries" },
+      { label: "Gaming", name: "Gaming", desc: "games, controllers and rewards" },
+      { label: "Travel", name: "Travel", desc: "trains, flights and hotels" }
+    ].map((x) => Object.assign({}, x, { pick: () => this.fillExample(x.name, x.desc) }));
+
+    const cur = isGroupView ? gById[view] : null;
+    const mergeOptions = isGroupView
+      ? groups.filter((g) => g.id !== view).map((g) => ({
+          id: g.id,
+          name: g.name,
+          color: g.color,
+          pick: () => this.mergeInto(view, g.id, cur.name, g.name)
+        }))
+      : [];
+
+    const rows = listEmails.map((e) => {
+      const c = groupOf(e);
+      const isOpen = open === e.id;
+      return {
+        id: e.id,
+        from: e.from,
+        subject: e.subject,
+        summary: e.summary,
+        time: e.time,
+        body: e.body,
+        color: c.color,
+        groupName: c.name,
+        ac: ac,
+        showGroup: view === "overview" || view === "reminders",
+        showAttn: e.attention && !e.done,
+        hasDue: !!e.due,
+        dueLabel: e.dueLabel || "",
+        showReminder: e.reminder,
+        showDone: e.done,
+        open: isOpen,
+        expanded: isOpen ? "true" : "false",
+        chevRot: isOpen ? 180 : 0,
+        subjectColor: e.done ? "#8A8A96" : "#ECECEF",
+        summaryColor: e.done ? "#8A8A96" : "#A0A0AB",
+        deco: e.done ? "line-through" : "none",
+        toggle: () => this.setState({ open: isOpen ? null : e.id }),
+        hasAction: !!e.action,
+        actionLine: "Suggested next step: " + e.action,
+        reminderLabel: e.reminder ? (e.dueLabel ? "Reminder on · " + e.dueLabel : "Reminder on") : "Set reminder",
+        remBorder: e.reminder ? ac : "#2B2B33",
+        remColor: e.reminder ? ac : "#ECECEF",
+        toggleReminder: () => this.setMap("rem", e.id, !e.reminder),
+        doneLabel: e.done ? "Done · Undo" : "Mark done",
+        doneBg: e.done ? "#ECECEF" : "#16161A",
+        doneFg: e.done ? "#0A0A0C" : "#ECECEF",
+        doneBorder: e.done ? "#ECECEF" : "#2B2B33",
+        toggleDone: () => this.setMap("done", e.id, !e.done),
+        filedNote: "Omnia filed this under " + c.name + ". Wrong? Move it:",
+        wasMoved: Object.prototype.hasOwnProperty.call(moved, e.id),
+        movedNote: "Got it. Omnia will file emails like this under " + c.name + ".",
+        moveOptions: groups.map((k) => ({
+          id: k.id,
+          name: k.name,
+          color: k.color,
+          bg: e.group === k.id ? "#ECECEF" : "#16161A",
+          fg: e.group === k.id ? "#0A0A0C" : "#D0D0D8",
+          border: e.group === k.id ? "#ECECEF" : "#2B2B33",
+          pick: () => this.setMap("moved", e.id, k.id)
+        }))
+      };
+    });
+
+    return {
+      accent: ac,
+      isOverview: view === "overview",
+      isGroupView: isGroupView,
+      title: title,
+      subtitle: subtitle,
+      digest: digest,
+      tabs: tabs,
+      cards: cards,
+      tidyCards: tidyCards,
+      hasTidy: tidyCards.length > 0,
+      listTitle: listTitle,
+      rows: rows,
+      empty: rows.length === 0,
+      emptyText: emptyText,
+      showList: view !== "new",
+      hasNotice: !!notice && view !== "new",
+      notice: notice,
+      tidyLabel: cur && cur.tidy ? "Bring back" : "Tidy away",
+      toggleTidy: () => { if (cur) this.toggleTidy(cur.id, cur.tidy); },
+      startRename: () => this.startRename(),
+      startMerge: () => this.startMerge(),
+      cancelPanel: () => this.cancelPanel(),
+      canMerge: groups.length > 1,
+      showRename: isGroupView && panel === "rename",
+      showMerge: isGroupView && panel === "merge",
+      renamePlaceholder: cur ? cur.name : "",
+      hasPanelError: !!panelError,
+      panelError: panelError,
+      saveRename: () => { if (cur) this.saveRename(cur.id); },
+      mergeTitle: cur ? "Merge " + cur.name + " into:" : "",
+      mergeOptions: mergeOptions,
+      groupNote: cur
+        ? (cur.tidy
+          ? "Tidied away: Omnia keeps this group out of your way, but still flags anything time-sensitive."
+          : "Omnia files new emails like this here automatically.")
+        : "",
+      isNewForm: view === "new" && stage === "form",
+      isNewResults: view === "new" && stage === "results" && !!draft,
+      hasError: !!formError,
+      formError: formError,
+      examples: examples,
+      hasMatches: matchRows.length > 0,
+      noMatches: view === "new" && stage === "results" && !!draft && draft.ids.length === 0,
+      noMatchText: "Omnia could not find any emails that match yet. You can still create the group, and new emails that match will be filed there.",
+      matchRows: matchRows,
+      createLabel: draft ? "Create " + draft.name + (picked > 0 ? " with " + pl(picked, "email") : "") : "Create group",
+      newBg: newSel ? "#ECECEF" : "transparent",
+      newFg: newSel ? "#0A0A0C" : "#B4B4BE",
+      newBorder: newSel ? "#ECECEF" : "#3A3A44",
+      newBorderStyle: newSel ? "solid" : "dashed",
+      newCurrent: newSel ? "page" : "false",
+      openNew: () => this.openNew(),
+      findMatches: () => this.findMatches(),
+      createGroup: () => this.createGroup(),
+      backToForm: () => this.backToForm(),
+      resetAll: () => this.resetAll()
+    };
+  }
+}
+
+  // ---- Tiny template engine: turns the markup in <template id="tpl"> into live DOM
+  var HOLE = /\{\{\s*([^}]*?)\s*\}\}/g;
+  var WHOLE = /^\s*\{\{\s*([^}]*?)\s*\}\}\s*$/;
+  var FOCUSABLE = { button: 1, input: 1, textarea: 1, select: 1, a: 1 };
+
+  function lookup(path, scope) {
+    if (path === "true") return true;
+    if (path === "false") return false;
+    var parts = path.split(".");
+    var cur = scope[parts[0]];
+    for (var i = 1; i < parts.length; i++) {
+      if (cur == null) return undefined;
+      cur = cur[parts[i]];
+    }
+    return cur;
+  }
+
+  function interp(str, scope) {
+    return str.replace(HOLE, function (_, p) {
+      var v = lookup(p, scope);
+      return v == null || v === false ? "" : String(v);
+    });
+  }
+
+  function handler(fn) {
+    return function () { fn(); };
+  }
+
+  function buildChildren(src, scope, dest, key) {
+    var kids = src.childNodes;
+    for (var i = 0; i < kids.length; i++) buildNode(kids[i], scope, dest, key + "/" + i);
+  }
+
+  function buildNode(n, scope, dest, key) {
+    if (n.nodeType === 3) {
+      dest.appendChild(document.createTextNode(n.nodeValue.indexOf("{{") === -1 ? n.nodeValue : interp(n.nodeValue, scope)));
+      return;
+    }
+    if (n.nodeType !== 1) return;
+    var tag = n.localName;
+    var m;
+    if (tag === "sc-if") {
+      m = WHOLE.exec(n.getAttribute("value") || "");
+      if (m && lookup(m[1], scope)) buildChildren(n, scope, dest, key);
+      return;
+    }
+    if (tag === "sc-for") {
+      m = WHOLE.exec(n.getAttribute("list") || "");
+      var list = (m && lookup(m[1], scope)) || [];
+      var as = n.getAttribute("as");
+      for (var j = 0; j < list.length; j++) {
+        var s = Object.create(scope);
+        s[as] = list[j];
+        s.$index = j;
+        var id = list[j] && list[j].id != null ? list[j].id : j;
+        buildChildren(n, s, dest, key + ":" + id);
+      }
+      return;
+    }
+    var el = document.createElementNS(n.namespaceURI, tag);
+    for (var a = 0; a < n.attributes.length; a++) {
+      var at = n.attributes[a];
+      var name = at.name;
+      var val = at.value;
+      var w = WHOLE.exec(val);
+      if (/^on[a-z]+$/.test(name)) {
+        if (w) {
+          var fn = lookup(w[1], scope);
+          if (typeof fn === "function") el.addEventListener(name.slice(2), handler(fn));
+        }
+      } else if (w) {
+        var v = lookup(w[1], scope);
+        if (v != null && v !== false) el.setAttribute(name, String(v));
+      } else {
+        el.setAttribute(name, val.indexOf("{{") === -1 ? val : interp(val, scope));
+      }
+    }
+    if (FOCUSABLE[tag]) el.setAttribute("data-k", key);
+    buildChildren(n, scope, el, key);
+    dest.appendChild(el);
+  }
+
+  var comp, APP, TPL;
+
+  function render() {
+    var vals = comp.renderVals();
+    var active = document.activeElement;
+    var activeKey = active && active.getAttribute ? active.getAttribute("data-k") : null;
+    var sel = null;
+    try {
+      if (active && typeof active.selectionStart === "number") sel = [active.selectionStart, active.selectionEnd];
+    } catch (e) { /* not a text field */ }
+    var saved = {};
+    APP.querySelectorAll("input[id], textarea[id]").forEach(function (e) { saved[e.id] = e.value; });
+    var x = window.pageXOffset;
+    var y = window.pageYOffset;
+
+    var frag = document.createDocumentFragment();
+    buildChildren(TPL, Object.assign({}, vals), frag, "");
+    while (APP.firstChild) APP.removeChild(APP.firstChild);
+    APP.appendChild(frag);
+
+    Object.keys(saved).forEach(function (id) {
+      var e = document.getElementById(id);
+      if (e && saved[id] !== "") e.value = saved[id];
+    });
+    if (activeKey) {
+      var els = APP.querySelectorAll("[data-k]");
+      for (var i = 0; i < els.length; i++) {
+        if (els[i].getAttribute("data-k") === activeKey) {
+          els[i].focus({ preventScroll: true });
+          try {
+            if (sel && els[i].setSelectionRange) els[i].setSelectionRange(sel[0], sel[1]);
+          } catch (e) { /* not a text field */ }
+          break;
+        }
+      }
+    }
+    window.scrollTo(x, y);
+  }
+
+  // ===== Omnia app: read-only Gmail connection. Emails live in this tab's memory only. =====
+  var CLIENT_ID = "86782541635-db8k97354u3i4j9mbe253361mtnh2ivt.apps.googleusercontent.com";
+  var SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
+  var API = "https://gmail.googleapis.com/gmail/v1/users/me";
+  var COUNT = 50;
+  var HEADERS = ["From", "Subject", "List-Unsubscribe", "Precedence", "Auto-Submitted"];
+  var FIELDS = "id,threadId,labelIds,snippet,internalDate,payload/headers";
+
+  var S = { token: "", expires: 0, account: "", busy: false, label: "", expired: false, loaded: false, syncedAt: 0 };
+  var GATE = document.getElementById("connect");
+  var BTN = document.getElementById("go");
+  var MSG = document.getElementById("msg");
+  var tokenClient = null;
+
+  function emptyReal() { return { groups: [], templates: [], emails: [], byId: {} }; }
+  function hhmm(ms) { var d = new Date(ms); return (d.getHours() < 10 ? "0" : "") + d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes(); }
+
+  class AppComponent extends Component {
+    constructor() {
+      super();
+      this.real = emptyReal();
+    }
+    setReal(res) {
+      var byId = {};
+      res.emails.forEach(function (e) { byId[e.id] = e; });
+      this.real = { groups: res.groups, templates: res.templates, emails: res.emails, byId: byId };
+      this.setState({});
+    }
+    baseGroups() {
+      var st = this.state || {};
+      var want = {};
+      [st.moved, st.merged].forEach(function (m) {
+        Object.keys(m || {}).forEach(function (k) { want[m[k]] = true; });
+      });
+      return this.real.templates
+        .filter(function (g) { return g.count > 0 || want[g.id]; })
+        .map(function (g) { return { id: g.id, name: g.name, desc: g.desc, color: g.color, tidy: g.tidy }; });
+    }
+    emailData() {
+      return this.real.emails;
+    }
+    renderVals() {
+      var self = this;
+      var st = this.state || {};
+      // forget "moved" choices that point at a group that does not exist any more
+      var ok = {};
+      this.groups().forEach(function (g) { ok[g.id] = true; });
+      var moved = {};
+      Object.keys(st.moved || {}).forEach(function (k) {
+        if (ok[self.resolve(st.moved[k])]) moved[k] = st.moved[k];
+      });
+      var vals;
+      this.state = Object.assign({}, st, { moved: moved });
+      try { vals = super.renderVals(); } finally { this.state = st; }
+      vals.rows = vals.rows.map(function (r) {
+        var e = self.real.byId[r.id];
+        return Object.assign(r, { link: e ? e.link : "", hasLink: !!(e && e.link) });
+      });
+      vals.todayLabel = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+      vals.syncLabel = S.syncedAt ? "Gmail · synced " + hhmm(S.syncedAt) : "Gmail";
+      vals.footNote = (S.account ? "Connected as " + S.account + ". " : "") +
+        "Read-only: Omnia can't send, delete or change anything. Your emails stay in this tab and are gone when you close it.";
+      vals.refreshLabel = S.busy ? (S.label || "Working…") : "Refresh";
+      vals.refresh = function () { refresh(); };
+      vals.disconnect = function () { disconnect(); };
+      return vals;
+    }
+  }
+
+  // ---- screens
+  function showApp(on) {
+    APP.hidden = !on;
+    GATE.hidden = !!on;
+    if (on) window.scrollTo(0, 0);
+  }
+
+  function say(text, kind) {
+    MSG.textContent = text || "";
+    MSG.setAttribute("data-kind", kind || "");
+  }
+
+  function tell(text, kind) {
+    if (S.loaded) comp.setState({ notice: text });
+    else say(text, kind);
+  }
+
+  function setBusy(on, label) {
+    S.busy = !!on;
+    S.label = label || "";
+    BTN.disabled = !!on;
+    BTN.textContent = on ? (label || "Working…") : "Connect Gmail";
+    if (S.loaded) comp.setState({});
+  }
+
+  // ---- Gmail API (GET only)
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function api(path, tries) {
+    tries = tries || 0;
+    return fetch(API + path, { headers: { Authorization: "Bearer " + S.token } }).then(function (r) {
+      if (r.status === 401) { var a = new Error("auth"); a.auth = true; throw a; }
+      if (r.ok) return r.json();
+      return r.json().catch(function () { return {}; }).then(function (body) {
+        var info = (body && body.error) || {};
+        var reason = (info.errors && info.errors[0] && info.errors[0].reason) || "";
+        var text = String(info.message || "") + " " + reason + " " + String(info.status || "");
+        if ((r.status === 429 || /rateLimit/i.test(text)) && tries < 3) {
+          return wait(700 * (tries + 1)).then(function () { return api(path, tries + 1); });
+        }
+        var e = new Error("http " + r.status);
+        e.status = r.status;
+        if (/accessNotConfigured|has not been used|is disabled/i.test(text)) e.api = true;
+        else if (/insufficientPermissions|insufficient authentication scopes|PERMISSION_DENIED/i.test(text)) e.scope = true;
+        else if (r.status === 429 || /rateLimit/i.test(text)) e.rate = true;
+        throw e;
+      });
+    });
+  }
+
+  function pool(items, n, fn) {
+    var out = new Array(items.length);
+    var next = 0;
+    var active = 0;
+    var dead = false;
+    return new Promise(function (resolve, reject) {
+      if (!items.length) { resolve(out); return; }
+      function go() {
+        if (dead) return;
+        if (next >= items.length) { if (active === 0) resolve(out); return; }
+        var k = next++;
+        active++;
+        Promise.resolve().then(function () { return fn(items[k]); }).then(
+          function (v) { out[k] = v; },
+          function (e) { if (!dead) { dead = true; reject(e); } }
+        ).then(function () { active--; go(); });
+      }
+      for (var w = 0; w < n && w < items.length; w++) go();
+    });
+  }
+
+  function fail(err) {
+    var m;
+    if (err && err.auth) {
+      S.expired = true;
+      m = "Your Google sign-in has expired (they last about an hour). Tap " + (S.loaded ? "Refresh" : "Connect Gmail") + " to sign in again.";
+    } else if (err && err.api) {
+      m = "The Gmail API isn't switched on in your Google project yet. In Google Cloud open APIs & Services, then Library, search for Gmail API and tap Enable.";
+    } else if (err && err.scope) {
+      m = "Omnia doesn't have permission to read your inbox. Tap Connect Gmail and leave the Gmail box ticked.";
+    } else if (err && err.rate) {
+      m = "Google asked Omnia to slow down. Wait a minute, then try again.";
+    } else if (err && err.name === "TypeError") {
+      m = "Couldn't reach Gmail. Check your connection and try again.";
+    } else {
+      m = "Something went wrong reading Gmail" + (err && err.status ? " (error " + err.status + ")" : "") + ". Try again in a moment.";
+    }
+    setBusy(false);
+    tell(m, "warn");
+  }
+
+  function sync() {
+    setBusy(true, "Reading your emails…");
+    var finished = 0;
+    var total = 0;
+    return api("/profile").then(function (p) {
+      S.account = (p && p.emailAddress) || "";
+      return api("/messages?maxResults=" + COUNT + "&labelIds=INBOX");
+    }).then(function (list) {
+      var ids = ((list && list.messages) || []).map(function (m) { return m.id; });
+      total = ids.length;
+      var q = "?format=metadata&" + HEADERS.map(function (h) { return "metadataHeaders=" + encodeURIComponent(h); }).join("&") + "&fields=" + encodeURIComponent(FIELDS);
+      return pool(ids, 6, function (id) {
+        return api("/messages/" + encodeURIComponent(id) + q).then(function (m) {
+          finished++;
+          if (finished % 5 === 0 || finished === total) setBusy(true, "Reading emails " + finished + " of " + total + "…");
+          return m;
+        }, function (e) {
+          if (e && (e.auth || e.api || e.scope)) throw e;
+          return null;
+        });
+      });
+    }).then(function (msgs) {
+      msgs = msgs.filter(Boolean);
+      if (total > 0 && msgs.length === 0) throw new Error("none");
+      var res = OmniaSort.sortMessages(msgs, { now: Date.now(), account: S.account });
+      S.syncedAt = Date.now();
+      S.loaded = true;
+      setBusy(false);
+      comp.setReal(res);
+      comp.setState({ notice: "" });
+      showApp(true);
+    }).catch(fail);
+  }
+
+  // ---- Google sign-in (token only, nothing stored)
+  function connect() {
+    if (S.busy) return;
+    if (!(window.google && google.accounts && google.accounts.oauth2)) {
+      tell("Google sign-in is still loading. Wait a few seconds and tap again. If it keeps happening, check your connection.", "warn");
+      return;
+    }
+    if (!tokenClient) {
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPE,
+        callback: onToken,
+        error_callback: onTokenError
+      });
+    }
+    say("", "");
+    setBusy(true, "Waiting for Google…");
+    tokenClient.requestAccessToken({ prompt: "select_account" });
+  }
+
+  function onToken(resp) {
+    if (!resp || resp.error) {
+      setBusy(false);
+      tell("Google didn't give Omnia access. Tap Connect Gmail and allow the Gmail permission.", "warn");
+      return;
+    }
+    var granted = true;
+    try { granted = google.accounts.oauth2.hasGrantedAllScopes(resp, SCOPE); } catch (e) { granted = true; }
+    if (!granted) {
+      setBusy(false);
+      tell("Omnia needs permission to read your inbox. Tap Connect Gmail again and leave the Gmail box ticked.", "warn");
+      return;
+    }
+    S.token = resp.access_token;
+    S.expires = Date.now() + (Number(resp.expires_in) || 3600) * 1000;
+    S.expired = false;
+    sync();
+  }
+
+  function onTokenError(err) {
+    setBusy(false);
+    var t = err && err.type;
+    if (t === "popup_closed") {
+      tell("The Google window was closed before it finished. If it said “Access blocked”, your Gmail still needs adding under Audience, Test users in Google Cloud.", "warn");
+    } else if (t === "popup_failed_to_open") {
+      tell("Your browser blocked the Google window. Allow pop-ups for this site, then tap Connect Gmail again.", "warn");
+    } else {
+      tell("Google sign-in didn't finish. Try again.", "warn");
+    }
+  }
+
+  function refresh() {
+    if (S.busy) return;
+    if (!S.token || S.expired || Date.now() > S.expires - 30000) { connect(); return; }
+    sync();
+  }
+
+  function disconnect() {
+    var t = S.token;
+    S.token = ""; S.expires = 0; S.account = ""; S.expired = false; S.loaded = false; S.syncedAt = 0;
+    comp.real = emptyReal();
+    comp.state = Object.assign({}, comp.state, { view: "overview", open: null, notice: "", panel: null, panelError: "", stage: "form", draft: null, formError: "" });
+    showApp(false);
+    APP.textContent = "";
+    setBusy(false);
+    say("Disconnected. Your emails were cleared from this tab and Omnia's access to your Gmail was removed.", "ok");
+    try {
+      if (t && window.google && google.accounts && google.accounts.oauth2) google.accounts.oauth2.revoke(t, function () {});
+    } catch (e) { /* nothing to undo */ }
+  }
+
+  APP = document.getElementById("app");
+  TPL = document.getElementById("tpl").content;
+  comp = new AppComponent();
+  comp.state = restore();
+  BTN.addEventListener("click", connect);
+  showApp(false);
+
+})();
+
+</script>
+</body>
+</html>
